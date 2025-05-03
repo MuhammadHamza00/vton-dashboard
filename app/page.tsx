@@ -21,7 +21,7 @@ export default function Home() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Testing Supabase</h1>
+      <h1 className="text-2xl font-bold mb-4">Testing Superbase</h1>
       <button 
         onClick={testSupabase} 
         className="p-2 mb-4 bg-blue-500 hover:bg-blue-600 text-white rounded"
