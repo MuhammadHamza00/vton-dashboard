@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient'; // adjust your import based on file path
+import { supabase } from '@/lib/supabaseClient';
+import { motion, AnimatePresence } from 'framer-motion';
+import CountUp from 'react-countup';
 
 export default function StatsCards() {
   const [stats, setStats] = useState({
@@ -16,21 +18,18 @@ export default function StatsCards() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        // Fetch total customers
         const { count: customersCount } = await supabase
           .from('Users')
           .select('*', { count: 'exact', head: true });
 
-        // Fetch total products
         const { count: productsCount } = await supabase
           .from('Products')
           .select('*', { count: 'exact', head: true });
 
-        // Fetch total orders
         const { count: ordersCount } = await supabase
           .from('Orders')
           .select('*', { count: 'exact', head: true });
-        // Fetch total sales (only completed orders)
+
         const { data: completedOrders, error } = await supabase
           .from('Orders')
           .select('total_amount')
@@ -56,12 +55,8 @@ export default function StatsCards() {
     fetchStats();
   }, []);
 
-  if (loading) {
-    return <p className="text-center text-gray-400">Loading stats...</p>;
-  }
-
   const statsData = [
-    { label: 'Total Sales', value: `$${stats.totalSales.toLocaleString()}` },
+    { label: 'Total Sales', value: stats.totalSales, isMoney: true },
     { label: 'Total Orders', value: stats.totalOrders },
     { label: 'Total Products', value: stats.totalProducts },
     { label: 'Total Customers', value: stats.totalCustomers },
@@ -69,12 +64,39 @@ export default function StatsCards() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
-      {statsData.map((stat) => (
-        <div key={stat.label} className="bg-[#111827] border-1 border-[#334155] hover:bg-[#000000] p-6 rounded-2xl shadow hover:shadow-lg transition-all">
-          <p className="text-[#9CA3AF] text-sm">{stat.label}</p>
-          <h3 className="text-[#ffffff] text-2xl font-bold mt-2">{stat.value}</h3>
-        </div>
-      ))}
+      <AnimatePresence>
+        {loading ? (
+          Array(4).fill(0).map((_, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              exit={{ opacity: 0 }}
+              className="bg-[#111827] border-1 border-[#334155] p-6 rounded-2xl shadow animate-pulse h-[100px]"
+            />
+          ))
+        ) : (
+          statsData.map((stat) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+              className="bg-[#111827] border-1 border-[#334155] hover:bg-[#000000] p-6 rounded-2xl shadow hover:shadow-lg transition-all"
+            >
+              <p className="text-[#9CA3AF] text-sm">{stat.label}</p>
+              <h3 className="text-[#ffffff] text-2xl font-bold mt-2">
+                <CountUp
+                  end={stat.value}
+                  duration={2}
+                  separator=","
+                  prefix={stat.isMoney ? '$' : ''}
+                />
+              </h3>
+            </motion.div>
+          ))
+        )}
+      </AnimatePresence>
     </div>
   );
 }

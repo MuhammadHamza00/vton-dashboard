@@ -24,3 +24,29 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer utilities {
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .animate-spin-slow {
+    animation: spin-slow 6s linear infinite;
+  }
+
+  @keyframes move-stars {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: 10000px 5000px;
+    }
+  }
+  .animate-stars {
+    animation: move-stars 200s linear infinite;
+  }
+}
