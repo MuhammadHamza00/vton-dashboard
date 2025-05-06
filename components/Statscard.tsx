@@ -18,6 +18,8 @@ export default function StatsCards() {
   useEffect(() => {
     async function fetchStats() {
       try {
+        setLoading(true);
+
         const { count: customersCount } = await supabase
           .from('Users')
           .select('*', { count: 'exact', head: true });
@@ -30,13 +32,22 @@ export default function StatsCards() {
           .from('Orders')
           .select('*', { count: 'exact', head: true });
 
-        const { data: completedOrders, error } = await supabase
+        const { data: completedOrders } = await supabase
           .from('Orders')
-          .select('total_amount')
+          .select('id, total_amount')
           .eq('status', 'Completed');
 
+        const { data: paidPayments } = await supabase
+          .from('Payments')
+          .select('order_id')
+          .eq('status', 'Paid');
+
+        const paidOrderIds = paidPayments?.map((payment) => payment.order_id) || [];
+
         const totalSalesAmount = completedOrders
-          ? completedOrders.reduce((sum, order) => sum + (order.total_amount || 0), 0)
+          ? completedOrders
+              .filter((order) => paidOrderIds.includes(order.id))
+              .reduce((sum, order) => sum + (order.total_amount || 0), 0)
           : 0;
 
         setStats({
@@ -53,6 +64,26 @@ export default function StatsCards() {
     }
 
     fetchStats();
+
+    // Real-time Subscriptions
+    const ordersChannel = supabase
+      .channel('orders-updates')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Orders' }, () => {
+        fetchStats();
+      })
+      .subscribe();
+
+    const paymentsChannel = supabase
+      .channel('payments-updates')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Payments' }, () => {
+        fetchStats();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(ordersChannel);
+      supabase.removeChannel(paymentsChannel);
+    };
   }, []);
 
   const statsData = [

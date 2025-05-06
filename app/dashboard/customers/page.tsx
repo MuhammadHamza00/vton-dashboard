@@ -1,40 +1,38 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { format } from 'date-fns';
+import { supabase } from '@/lib/supabaseClient';
+import { toast } from 'react-hot-toast';
 
 interface Customer {
-  id: string;
+  userId: string;
   name: string;
   email: string;
   created_at: string;
+  address: string;
+  phone: number;
   totalSpend: number;
+ 
 }
-
-// Initialize supabase client manually
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const customersPerPage = 8;
 
   useEffect(() => {
     fetchCustomers();
   }, []);
 
   async function fetchCustomers() {
-    setLoading(true);
     try {
+      setLoading(true);
+
       const { data: usersData, error: usersError } = await supabase
         .from('Users')
-        .select('userId, name, email, created_at');
+        .select('userId, name, email, address,created_at,phone');
 
       if (usersError) throw usersError;
 
@@ -55,47 +53,70 @@ export default function CustomersPage() {
         }
       });
 
-      const mergedData: Customer[] = usersData?.map((user) => ({
-        id: user.userId,
-        name: user.name,
-        email: user.email,
-        created_at: user.created_at,
+      const mergedData = usersData?.map((user) => ({
+        ...user,
         totalSpend: userSpends[user.userId] || 0,
       }));
 
       setCustomers(mergedData || []);
     } catch (error: any) {
       console.error('Error fetching customers:', error.message);
+      toast.error('Failed to fetch customers.');
     } finally {
       setLoading(false);
     }
   }
 
+  async function deleteCustomer(userId: string) {
+    const confirmDelete = confirm('Are you sure you want to delete this customer? This action cannot be undone.');
+    if (!confirmDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('Users')
+        .delete()
+        .eq('userId', userId);
+
+      if (error) {
+        console.error('Error deleting customer:', error.message);
+        toast.error('Failed to delete customer.');
+      } else {
+        toast.success('Customer deleted successfully.');
+        // Refresh table after deleting
+        fetchCustomers();
+      }
+    } catch (error: any) {
+      console.error('Error deleting customer:', error.message);
+      toast.error('An unexpected error occurred.');
+    }
+  }
+
   const filteredCustomers = customers.filter((customer) =>
-    `${customer.name} ${customer.email}`.toLowerCase().includes(searchQuery.toLowerCase())
+    `${customer.name} ${customer.email}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredCustomers.length / pageSize);
-  const paginatedCustomers = filteredCustomers.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const indexOfLastCustomer = currentPage * customersPerPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+  const currentCustomers = filteredCustomers.slice(indexOfFirstCustomer, indexOfLastCustomer);
+
+  const totalPages = Math.ceil(filteredCustomers.length / customersPerPage);
 
   return (
     <div className="bg-[#111827] border-1 border-[#334155] p-6 rounded-2xl shadow hover:shadow-lg transition-all">
       <h3 className="text-white text-xl mb-4">Customers</h3>
 
-      {/* Simple input field */}
-      <input
-        type="text"
-        placeholder="Search customers..."
-        value={searchQuery}
-        onChange={(e) => {
-          setSearchQuery(e.target.value);
-          setCurrentPage(1); // reset to first page when search
-        }}
-        className="w-full mb-6 p-2 rounded bg-[#1f2937] text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500"
-      />
+      {/* Search Bar */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by name or email..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full p-3 rounded-lg bg-[#1F2937] text-white placeholder-gray-400"
+        />
+      </div>
 
       <div className="overflow-x-auto">
         <table className="min-w-full">
@@ -103,33 +124,39 @@ export default function CustomersPage() {
             <tr className="text-left text-white">
               <th className="py-3 px-3">Name</th>
               <th className="py-3 px-3">Email</th>
-              <th className="py-3 px-3">Created At</th>
+              <th className="py-3 px-3">Phone</th>
+              <th className="py-3 px-3">Joined</th>
               <th className="py-3 px-3">Total Spend</th>
+              <th className="py-3 px-3">Address</th>
+              <th className="py-3 px-3">Actions</th>
             </tr>
           </thead>
           <tbody className="text-white">
             {loading ? (
               <tr>
-                <td colSpan={4} className="text-center py-8">
-                  Loading customers...
-                </td>
+                <td colSpan={5} className="text-center py-8">Loading customers...</td>
               </tr>
-            ) : paginatedCustomers.length === 0 ? (
+            ) : currentCustomers.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-8">
-                  No customers found.
-                </td>
+                <td colSpan={5} className="text-center py-8">No customers found.</td>
               </tr>
             ) : (
-              paginatedCustomers.map((customer) => (
-                <tr
-                  key={customer.id}
-                  className="border-t px-3 py-3 border-[#334155] hover:bg-[#000000] hover:border-[#334155]"
-                >
+              currentCustomers.map((customer) => (
+                <tr key={customer.userId} className="border-t border-[#334155] hover:bg-[#000000]">
                   <td className="py-3 px-3">{customer.name}</td>
                   <td className="py-3 px-3">{customer.email}</td>
-                  <td className="py-3 px-3">{format(new Date(customer.created_at), 'dd MMM yyyy')}</td>
-                  <td className="py-3 px-3">${customer.totalSpend.toFixed(2)}</td>
+                  <td className="py-3 px-3">{customer.phone}</td>
+                  <td className="py-3 px-3">{new Date(customer.created_at).toLocaleDateString()}</td>
+                  <td className="py-3 px-3">${customer.totalSpend.toLocaleString()}</td>
+                  <td className="py-3 px-3">{customer.address}</td>
+                  <td className="py-3 px-3">
+                    <button
+                      onClick={() => deleteCustomer(customer.userId)}
+                      className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm"
+                      >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))
             )}
@@ -137,25 +164,23 @@ export default function CustomersPage() {
         </table>
       </div>
 
-      {/* Simple Pagination */}
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center space-x-4 mt-6">
+        <div className="flex justify-center items-center mt-6 space-x-2">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="bg-[#334155] text-white px-4 py-2 rounded hover:bg-[#1f2937] disabled:opacity-50"
+            className="px-3 py-1 bg-[#1F2937] rounded text-white disabled:opacity-50"
           >
-            Previous
+            Prev
           </button>
 
-          <span className="text-white">
-            Page {currentPage} of {totalPages}
-          </span>
+          <span className="text-white">{currentPage} / {totalPages}</span>
 
           <button
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="bg-[#334155] text-white px-4 py-2 rounded hover:bg-[#1f2937] disabled:opacity-50"
+            className="px-3 py-1 bg-[#1F2937] rounded text-white disabled:opacity-50"
           >
             Next
           </button>
