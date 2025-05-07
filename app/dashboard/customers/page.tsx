@@ -12,7 +12,7 @@ interface Customer {
   address: string;
   phone: number;
   totalSpend: number;
- 
+
 }
 
 export default function CustomersPage() {
@@ -104,7 +104,7 @@ export default function CustomersPage() {
   const totalPages = Math.ceil(filteredCustomers.length / customersPerPage);
 
   return (
-    <div className="bg-[#111827] border-1 border-[#334155] p-6 rounded-2xl shadow hover:shadow-lg transition-all">
+    <div className="bg-[#111827] border-1 border-[#334155]  p-6 rounded-2xl shadow hover:shadow-lg transition-all">
       <h3 className="text-white text-xl mb-4">Customers</h3>
 
       {/* Search Bar */}
@@ -118,7 +118,8 @@ export default function CustomersPage() {
         />
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full">
           <thead>
             <tr className="text-left text-white">
@@ -134,11 +135,11 @@ export default function CustomersPage() {
           <tbody className="text-white">
             {loading ? (
               <tr>
-                <td colSpan={5} className="text-center py-8">Loading customers...</td>
+                <td colSpan={7} className="text-center py-8">Loading customers...</td>
               </tr>
             ) : currentCustomers.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center py-8">No customers found.</td>
+                <td colSpan={7} className="text-center py-8">No customers found.</td>
               </tr>
             ) : (
               currentCustomers.map((customer) => (
@@ -153,7 +154,7 @@ export default function CustomersPage() {
                     <button
                       onClick={() => deleteCustomer(customer.userId)}
                       className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm"
-                      >
+                    >
                       Delete
                     </button>
                   </td>
@@ -163,6 +164,50 @@ export default function CustomersPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Mobile/Tablet Card View */}
+      <div className="block md:hidden space-y-2 p-0">
+        {loading ? (
+          <div className="text-center text-white">Loading customers...</div>
+        ) : currentCustomers.length === 0 ? (
+          <div className="text-center text-white">No customers found.</div>
+        ) : (
+          currentCustomers.map((customer) => (
+            <div
+              key={customer.userId}
+              className="bg-[#000000] border border-[#334155] rounded-xl p-4 text-white shadow hover:shadow-lg transition-all"
+            >
+              <div className="mb-2">
+                <span className="font-normal text-gray-400">Name:</span> {customer.name}
+              </div>
+              <div className="mb-2">
+                <span className="font-normal text-gray-400">Email:</span> {customer.email}
+              </div>
+              <div className="mb-2">
+                <span className="font-normal text-gray-400">Phone:</span> {customer.phone}
+              </div>
+              <div className="mb-2">
+                <span className="font-normal text-gray-400">Joined:</span> {new Date(customer.created_at).toLocaleDateString()}
+              </div>
+              <div className="mb-2">
+                <span className="font-normal text-gray-400">Total Spend:</span> ${customer.totalSpend.toLocaleString()}
+              </div>
+              <div className="mb-2">
+                <span className="font-normal text-gray-400">Address:</span> {customer.address}
+              </div>
+              <div className=" mt-4">
+                <button
+                  onClick={() => deleteCustomer(customer.userId)}
+                  className="bg-red-600 w-full hover:bg-red-700 text-white py-1 px-3 rounded text-sm"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
 
       {/* Pagination */}
       {totalPages > 1 && (

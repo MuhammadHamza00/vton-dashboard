@@ -152,95 +152,180 @@ export default function OrdersPage() {
         />
       </div>
 
-      <div className="bg-[#111827] border-1 rounded-2xl shadow hover:shadow-lg transition-all">
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead>
-              <tr className="text-left text-white">
-                <th className="py-3 px-3">ID</th>
-                <th className="py-3 px-3">Name</th>
-                <th className="py-3 px-3">Amount</th>
-                <th className="py-3 px-3">Shipping Status</th>
-                <th className="py-3 px-3">Shipping Address</th>
-                <th className="py-3 px-3">Payment Status</th>
-                <th className="py-3 px-3">Payment Method</th>
-                <th className="py-3 px-3">Payment Date</th>
-                <th className="py-3 px-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="text-white">
-              {loading ? (
-                <tr>
-                  <td colSpan={9} className="text-center py-8">
-                    Loading orders...
-                  </td>
+        <div className="bg-[#111827] rounded-2xl shadow hover:shadow-lg transition-all">
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="min-w-full">
+              <thead>
+                <tr className="text-left text-white">
+                  <th className="py-3 px-3">ID</th>
+                  <th className="py-3 px-3">Name</th>
+                  <th className="py-3 px-3">Amount</th>
+                  <th className="py-3 px-3">Shipping Status</th>
+                  <th className="py-3 px-3">Shipping Address</th>
+                  <th className="py-3 px-3">Payment Status</th>
+                  <th className="py-3 px-3">Payment Method</th>
+                  <th className="py-3 px-3">Payment Date</th>
+                  <th className="py-3 px-3">Actions</th>
                 </tr>
-              ) : currentOrders.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="text-center py-8">
-                    No orders found.
-                  </td>
-                </tr>
-              ) : (
-                currentOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="border-t border-[#334155] hover:bg-[#000000]"
-                  >
-                    <td className="py-3 px-3">{order.id}</td>
-                    <td className="py-3 px-3">{order.user_name}</td>
-                    <td className="py-3 px-3">${order.total_amount.toFixed(2)}</td>
-                    <td className="py-3 px-3">
-                      <select
-                        value={order.status}
-                        onChange={(e) => handleShippingStatusChange(order.id, e.target.value)}
-                        className="bg-[#1F2937] border border-[#334155] text-white rounded p-2"
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Returned">Returned</option>
-                      </select>
+              </thead>
+              <tbody className="text-white">
+                {loading ? (
+                  <tr>
+                    <td colSpan={9} className="text-center py-8">
+                      Loading orders...
                     </td>
-                    <td className="py-3 px-3">{order.shipping_address}</td>
-                    <td className="py-3 px-3">
-                      {order.payment_id ? (
+                  </tr>
+                ) : currentOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} className="text-center py-8">
+                      No orders found.
+                    </td>
+                  </tr>
+                ) : (
+                  currentOrders.map((order) => (
+                    <tr
+                      key={order.id}
+                      className="border-t border-[#334155] hover:bg-[#000000]"
+                    >
+                      <td className="py-3 px-3">{order.id}</td>
+                      <td className="py-3 px-3">{order.user_name}</td>
+                      <td className="py-3 px-3">${order.total_amount.toFixed(2)}</td>
+                      <td className="py-3 px-3">
                         <select
-                          value={order.payment_status}
+                          value={order.status}
                           onChange={(e) =>
-                            handlePaymentStatusChange(order.payment_id!, e.target.value)
+                            handleShippingStatusChange(order.id, e.target.value)
                           }
                           className="bg-[#1F2937] border border-[#334155] text-white rounded p-2"
                         >
                           <option value="Pending">Pending</option>
-                          <option value="Paid">Paid</option>
-                          <option value="Failed">Failed</option>
-                          <option value="Refunded">Refunded</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Completed">Completed</option>
+                          <option value="Returned">Returned</option>
                         </select>
-                      ) : (
-                        'No Payment'
-                      )}
-                    </td>
-                    <td className="py-3 px-3">{order.payment_method}</td>
-                    <td className="py-3 px-3">
-                      {order.payment_date
-                        ? new Date(order.payment_date).toLocaleDateString()
-                        : '-'}
-                    </td>
-                    <td className="py-3 px-3">
-                      <button
-                        onClick={() => handleDelete(order.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm"
+                      </td>
+                      <td className="py-3 px-3">{order.shipping_address}</td>
+                      <td className="py-3 px-3">
+                        {order.payment_id ? (
+                          <select
+                            value={order.payment_status}
+                            onChange={(e) =>
+                              handlePaymentStatusChange(order.payment_id!, e.target.value)
+                            }
+                            className="bg-[#1F2937] border border-[#334155] text-white rounded p-2"
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Failed">Failed</option>
+                            <option value="Refunded">Refunded</option>
+                          </select>
+                        ) : (
+                          'No Payment'
+                        )}
+                      </td>
+                      <td className="py-3 px-3">{order.payment_method}</td>
+                      <td className="py-3 px-3">
+                        {order.payment_date
+                          ? new Date(order.payment_date).toLocaleDateString()
+                          : '-'}
+                      </td>
+                      <td className="py-3 px-3">
+                        <button
+                          onClick={() => handleDelete(order.id)}
+                          className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile/Tablet Card View */}
+          <div className="block md:hidden space-y-4 ">
+            {loading ? (
+              <div className="text-center text-white">Loading orders...</div>
+            ) : currentOrders.length === 0 ? (
+              <div className="text-center text-white">No orders found.</div>
+            ) : (
+              currentOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="bg-[#000000] border border-[#334155] rounded-xl p-4 text-white shadow hover:shadow-lg transition-all"
+                >
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="text-sm text-gray-400">Order ID:</div>
+                    <div className="font-semibold">{order.id}</div>
+                  </div>
+                  <div className="mb-2">
+                    <span className="font-semibold">Name:</span> {order.user_name}
+                  </div>
+                  <div className="mb-2">
+                    <span className="font-semibold">Amount:</span> ${order.total_amount.toFixed(2)}
+                  </div>
+                  <div className="mb-2">
+                    <span className="font-semibold">Shipping Status:</span>
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        handleShippingStatusChange(order.id, e.target.value)
+                      }
+                      className="mt-1 bg-[#111827] border border-[#334155] text-white rounded p-2 w-full"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Returned">Returned</option>
+                    </select>
+                  </div>
+                  <div className="mb-2">
+                    <span className="font-semibold">Shipping Address:</span> {order.shipping_address}
+                  </div>
+                  <div className="mb-2">
+                    <span className="font-semibold">Payment Status:</span>
+                    {order.payment_id ? (
+                      <select
+                        value={order.payment_status}
+                        onChange={(e) =>
+                          handlePaymentStatusChange(order.payment_id!, e.target.value)
+                        }
+                        className="mt-1 bg-[#111827] border border-[#334155] text-white rounded p-2 w-full"
                       >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Failed">Failed</option>
+                        <option value="Refunded">Refunded</option>
+                      </select>
+                    ) : (
+                      ' No Payment'
+                    )}
+                  </div>
+                  <div className="mb-2">
+                    <span className="font-semibold">Payment Method:</span> {order.payment_method}
+                  </div>
+                  <div className="mb-2">
+                    <span className="font-semibold">Payment Date:</span>{' '}
+                    {order.payment_date
+                      ? new Date(order.payment_date).toLocaleDateString()
+                      : '-'}
+                  </div>
+                  <div className="text-right mt-4">
+                    <button
+                      onClick={() => handleDelete(order.id)}
+                      className="bg-red-600 hover:bg-red-700 w-full text-white py-1 px-3 rounded text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
 
         {/* Pagination */}
         {totalPages > 1 && (

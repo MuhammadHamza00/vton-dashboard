@@ -150,41 +150,29 @@ export default function OrdersPage() {
         />
       </div>
 
-      <div className="bg-[#111827] border-1 rounded-2xl shadow hover:shadow-lg transition-all">
-        <div className="overflow-x-auto">
+      <div className="bg-[#111827] rounded-2xl shadow hover:shadow-lg transition-all">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="min-w-full">
             <thead>
               <tr className="text-left text-white">
-                <th className="py-3 px-3">ID</th>
-                <th className="py-3 px-3">Name</th>
-                <th className="py-3 px-3">Amount</th>
-                <th className="py-3 px-3">Shipping Status</th>
-                <th className="py-3 px-3">Shipping Address</th>
-                <th className="py-3 px-3">Payment Status</th>
-                <th className="py-3 px-3">Payment Method</th>
-                <th className="py-3 px-3">Payment Date</th>
-                <th className="py-3 px-3">Actions</th>
+                {['ID', 'Name', 'Amount', 'Shipping Status', 'Shipping Address', 'Payment Status', 'Payment Method', 'Payment Date', 'Actions'].map((heading, idx) => (
+                  <th key={idx} className="py-3 px-3">{heading}</th>
+                ))}
               </tr>
             </thead>
             <tbody className="text-white">
               {loading ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-8">
-                    Loading orders...
-                  </td>
+                  <td colSpan={9} className="text-center py-8">Loading orders...</td>
                 </tr>
               ) : currentOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-8">
-                    No orders found.
-                  </td>
+                  <td colSpan={9} className="text-center py-8">No orders found.</td>
                 </tr>
               ) : (
                 currentOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="border-t border-[#334155] hover:bg-[#000000]"
-                  >
+                  <tr key={order.id} className="border-t border-[#334155] hover:bg-[#000000]">
                     <td className="py-3 px-3">{order.id}</td>
                     <td className="py-3 px-3">{order.user_name}</td>
                     <td className="py-3 px-3">${order.total_amount.toFixed(2)}</td>
@@ -205,9 +193,7 @@ export default function OrdersPage() {
                       {order.payment_id ? (
                         <select
                           value={order.payment_status}
-                          onChange={(e) =>
-                            handlePaymentStatusChange(order.payment_id!, e.target.value)
-                          }
+                          onChange={(e) => handlePaymentStatusChange(order.payment_id!, e.target.value)}
                           className="bg-[#1F2937] border border-[#334155] text-white rounded p-2"
                         >
                           <option value="Pending">Pending</option>
@@ -220,11 +206,7 @@ export default function OrdersPage() {
                       )}
                     </td>
                     <td className="py-3 px-3">{order.payment_method}</td>
-                    <td className="py-3 px-3">
-                      {order.payment_date
-                        ? new Date(order.payment_date).toLocaleDateString()
-                        : '-'}
-                    </td>
+                    <td className="py-3 px-3">{order.payment_date ? new Date(order.payment_date).toLocaleDateString() : '-'}</td>
                     <td className="py-3 px-3">
                       <button
                         onClick={() => handleDelete(order.id)}
@@ -240,29 +222,97 @@ export default function OrdersPage() {
           </table>
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-6 gap-4">
-            <button
-              onClick={goToPreviousPage}
-              disabled={currentPage === 1}
-              className="bg-gray-700 hover:bg-gray-600 text-white py-1 px-4 rounded disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span className="text-white mt-1">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={goToNextPage}
-              disabled={currentPage === totalPages}
-              className="bg-gray-700 hover:bg-gray-600 text-white py-1 px-4 rounded disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-        )}
+        {/* Mobile Card View */}
+        <div className="block md:hidden p-0 space-y-4">
+          {loading ? (
+            <div className="text-center text-white py-8">Loading orders...</div>
+          ) : currentOrders.length === 0 ? (
+            <div className="text-center text-white py-8">No orders found.</div>
+          ) : (
+            currentOrders.map((order) => (
+              <div key={order.id} className="border border-[#334155] rounded-lg p-4 bg-[#000000] text-white shadow-sm">
+                <div className="mb-2">
+                  <div className="font-semibold text-lg">#{order.id}</div>
+                  <div className="text-sm text-gray-400">{order.user_name}</div>
+                </div>
+                <div className="mb-2">
+                  <span className="text-gray-400 text-xs">Amount:</span> ${order.total_amount.toFixed(2)}
+                </div>
+                <div className="mb-2">
+                  <span className="text-gray-400 text-xs">Shipping Status:</span><br />
+                  <select
+                    value={order.status}
+                    onChange={(e) => handleShippingStatusChange(order.id, e.target.value)}
+                    className="mt-1 w-full bg-[#1F2937] border border-[#334155] text-white rounded p-2 text-sm"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Returned">Returned</option>
+                  </select>
+                </div>
+                <div className="mb-2 text-sm">
+                  <span className="text-gray-400">Address:</span> {order.shipping_address}
+                </div>
+                <div className="mb-2">
+                  <span className="text-gray-400 text-xs">Payment Status:</span><br />
+                  {order.payment_id ? (
+                    <select
+                      value={order.payment_status}
+                      onChange={(e) => handlePaymentStatusChange(order.payment_id!, e.target.value)}
+                      className="mt-1 w-full bg-[#1F2937] border border-[#334155] text-white rounded p-2 text-sm"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Paid">Paid</option>
+                      <option value="Failed">Failed</option>
+                      <option value="Refunded">Refunded</option>
+                    </select>
+                  ) : (
+                    <div>No Payment</div>
+                  )}
+                </div>
+                <div className="mb-2 text-sm">
+                  <span className="text-gray-400">Payment Method:</span> {order.payment_method}
+                </div>
+                <div className="mb-4 text-sm">
+                  <span className="text-gray-400">Payment Date:</span> {order.payment_date ? new Date(order.payment_date).toLocaleDateString() : '-'}
+                </div>
+                <div className="flex">
+                  <button
+                    onClick={() => handleDelete(order.id)}
+                    className="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded text-sm w-full"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-6 gap-4">
+          <button
+            onClick={goToPreviousPage}
+            disabled={currentPage === 1}
+            className="bg-gray-700 hover:bg-gray-600 text-white py-1 px-4 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="text-white mt-1">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages}
+            className="bg-gray-700 hover:bg-gray-600 text-white py-1 px-4 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
