@@ -89,7 +89,7 @@ export default function AddProductPage() {
     }
 
     return (
-        <div className="bg-[#111827] p-6 rounded-2xl shadow hover:shadow-lg transition-all max-w-5xl mx-auto mt-10">
+        <div className="bg-[#111827] p-2 rounded-2xl shadow hover:shadow-lg transition-all max-w-5xl mx-auto mt-6">
             <h3 className="text-white text-xl mb-6">Add Product</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

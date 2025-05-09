@@ -22,7 +22,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="flex flex-col flex-1 overflow-hidden border-1 border-[#334155] ">
             <Topbar toggleSidebar={toggleSidebar} />
             <Toaster position="top-center" />
-            <main className="p-6">{children}</main>
+            <main className="p-2">{children}</main>
           </div>
         </div>
       </AuthProvider>

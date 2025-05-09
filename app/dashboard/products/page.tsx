@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation'; // at top
+import { FaTrash } from 'react-icons/fa6';
 
 interface Product {
   id: number;
@@ -90,8 +91,8 @@ export default function ProductsPage() {
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   return (
-    <div className="bg-[#111827] border-1 border-[#334155] p-6 rounded-2xl shadow hover:shadow-lg transition-all">
-      <h3 className="text-white text-xl mb-4">Products</h3>
+    <div className="bg-[#111827] border-1 border-[#334155] p-2 rounded-2xl shadow hover:shadow-lg transition-all">
+      <h3 className="text-white text-xl mb-4 ">Products</h3>
 
       {/* Search Bar */}
       <div className="mb-4">
@@ -183,16 +184,16 @@ export default function ProductsPage() {
       </div>
 
       {/* Mobile Card View */}
-      <div className="block md:hidden">
+      <div className="block md:hidden ">
         {loading ? (
           <div className="text-center py-8 text-white">Loading products...</div>
         ) : currentProducts.length === 0 ? (
           <div className="text-center py-8 text-white">No products found.</div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 ">
             {currentProducts.map((product) => (
               <div key={product.id} className="border border-[#334155] rounded-lg p-4 bg-[#0f172a] shadow-sm text-white">
-                <div className="flex justify-between mb-2">
+                <div className="flex justify-between mb-2 ">
                   <div className="font-semibold">{product.name}</div>
                   <div className="text-sm">${product.price.toFixed(2)}</div>
                 </div>
