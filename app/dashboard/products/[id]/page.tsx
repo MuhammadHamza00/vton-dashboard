@@ -5,12 +5,14 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import EditProductForm from "@/components/EditProductForm";
 import ProductReviews from "@/components/ProductReviews";
+import AIProductsEnhancer from "@/components/AIProductsEnhancer";
+
 
 export default function ProductPage() {
   const { id } = useParams(); // 👈 no need to rename here
   const productId = id as string; // 👈 cast to string safely
 
-  const [activeTab, setActiveTab] = useState<"edit" | "reviews">("edit");
+  const [activeTab, setActiveTab] = useState<"edit" | "reviews" | "ai-enhancer">("edit");
 
   if (!productId) {
     return <p className="text-white">Invalid Product ID</p>;
@@ -39,11 +41,23 @@ export default function ProductPage() {
         >
           Reviews
         </button>
+         <button
+          className={`px-4 py-2 font-semibold ${
+            activeTab === "ai-enhancer"
+              ? "border-b-2 border-blue-500 text-blue-400"
+              : "text-gray-400"
+          }`}
+          onClick={() => setActiveTab("ai-enhancer")}
+        >
+          AI Enhancer
+        </button>
       </div>
 
       <div className="mt-6">
         {activeTab === "edit" && <EditProductForm />}
         {activeTab === "reviews" && <ProductReviews productId={productId} />}
+        {activeTab === "ai-enhancer" && <AIProductsEnhancer productId={productId}/>}
+
       </div>
     </div>
   );

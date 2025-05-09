@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-hot-toast";
-import { FaTrash } from "react-icons/fa"; // 👈 For better delete icon
+import { FaTrash } from "react-icons/fa";
 
 type Review = {
   id: number;
@@ -13,6 +13,7 @@ type Review = {
   content: string;
   stars: number;
   created_at: string;
+  reply_content: string | null;
 };
 
 type Users = {
@@ -25,6 +26,8 @@ export default function ProductReviews({ productId }: { productId: string }) {
   const [users, setUsers] = useState<Users[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [replyingReviewId, setReplyingReviewId] = useState<number | null>(null);
+  const [replyText, setReplyText] = useState<string>("");
   const reviewsPerPage = 5;
 
   useEffect(() => {
@@ -55,7 +58,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
     if (error) {
       toast.error("Failed to load users");
     } else {
-      setUsers(data || [] );
+      setUsers(data || []);
     }
   };
 
@@ -71,6 +74,27 @@ export default function ProductReviews({ productId }: { productId: string }) {
     } else {
       toast.success("Review deleted");
       fetchReviews();
+    }
+  };
+
+  const handleReplySubmit = async (reviewId: number) => {
+    if (!replyText.trim()) {
+      toast.error("Reply cannot be empty");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("Reviews")
+      .update({ reply_content: replyText })
+      .eq("id", reviewId);
+
+    if (error) {
+      toast.error("Failed to submit reply");
+    } else {
+      toast.success("Reply submitted successfully");
+      fetchReviews();
+      setReplyingReviewId(null);
+      setReplyText("");
     }
   };
 
@@ -93,7 +117,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
 
   return (
     <div className="space-y-6">
-      {/* ⭐ Average rating on top */}
+      {/* ⭐ Average rating */}
       <div className="text-center mb-3">
         <div className="text-yellow-400 text-3xl">
           {Array.from({ length: Math.floor(averageRating) }).map((_, i) => (
@@ -127,15 +151,62 @@ export default function ProductReviews({ productId }: { productId: string }) {
             {getUserInfo(review.user_id)}
           </div>
 
-          {/* Fancy Delete Button */}
-          <div className="flex justify-end">
-            <button
-              onClick={() => handleDelete(review.id)}
-              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all text-sm"
-            >
-              <FaTrash /> Delete
-            </button>
-          </div>
+          {/* Show Admin Reply if available */}
+          {review.reply_content && (
+            <div className="bg-blue-900 text-blue-200 p-3 rounded-lg mt-3 text-sm">
+              <strong>Admin Reply:</strong> {review.reply_content}
+            </div>
+          )}
+
+          {/* Reply Section */}
+          {replyingReviewId === review.id ? (
+            <div className="mt-4 space-y-2">
+              <textarea
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder="Type your reply here..."
+                className="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white"
+                rows={3}
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleReplySubmit(review.id)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md"
+                >
+                  Submit Reply
+                </button>
+                <button
+                  onClick={() => {
+                    setReplyingReviewId(null);
+                    setReplyText("");
+                  }}
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg shadow-md"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setReplyingReviewId(review.id);
+                  setReplyText(review.reply_content || "");
+                }}
+                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full text-sm"
+              >
+                {review.reply_content ? "Edit Reply" : "Reply"}
+              </button>
+
+              {/* Delete Button */}
+              <button
+                onClick={() => handleDelete(review.id)}
+                className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full shadow-md text-sm"
+              >
+                <FaTrash /> Delete
+              </button>
+            </div>
+          )}
         </div>
       ))}
 

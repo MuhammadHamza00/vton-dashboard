@@ -24,9 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body 
+      <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-900 text-white`}
-      >
+      ><script src="https://js.puter.com/v2/"></script>
+
         {children}
       </body>
     </html>
