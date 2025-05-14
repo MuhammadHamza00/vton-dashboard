@@ -19,11 +19,10 @@ export default function AIProductsEnhancer({ productId }: { productId: string })
         features: string[];
         reviews: string[];
     }>(null);
-
     const [activeTab, setActiveTab] = useState<"summary" | "seo">("summary");
 
     const [reviewSummary, setReviewSummary] = useState("");
-    const [seoData, setSeoData] = useState({ title: "", description: "" });
+    const [seoData, setSeoData] = useState({ html: "" });
 
     const [loadingReview, setLoadingReview] = useState(false);
     const [loadingSEO, setLoadingSEO] = useState(false);
@@ -87,10 +86,10 @@ export default function AIProductsEnhancer({ productId }: { productId: string })
             setLoadingReview(true);
             setReviewSummary("");
 
-            const prompt = `Summarize the following customer reviews into a detailed paragraph:\n\n${productData.reviews.join("\n")}`;
+            const prompt = `Summarize the following customer reviews in short paragraph:\n\n${productData.reviews.join("\n")}`;
 
             const response = await window.puter.ai.chat(prompt, {
-                model: "meta-llama/llama-4-maverick",
+                model: "gpt-4o-mini",
                 stream: true,
             });
 
@@ -115,20 +114,17 @@ export default function AIProductsEnhancer({ productId }: { productId: string })
 
         try {
             setLoadingSEO(true);
-            setSeoData({ title: "", description: "" });
+            setSeoData({ html: "" }); // single field for full HTML
 
             const prompt = `
-Create a product title, description, and feature list in clean HTML tags (<h2>, <p>, <ul><li>) for:
-
-Name: ${productData.name}
-Category: ${productData.category}
-Features: ${productData.features.join(", ")}
-Description: ${productData.description}
-`;
-
+            I'm giving you product data Title${productData.name},Description  ${productData.description},Category ${productData.category} and Features ${productData.features.join(", ")}.
+            You've to act as SEO expert and generate optimized Title, description,category and features list even if something is missing.
+            Format: Bold Title: Optimized title Same for other properties.
+            Only respond with pure HTML. No code block formatting. No explanations.
+            `;
 
             const response = await window.puter.ai.chat(prompt, {
-                model: "meta-llama/llama-4-maverick",
+                model: "gpt-4o-mini",
                 stream: true,
             });
 
@@ -138,12 +134,7 @@ Description: ${productData.description}
                 fullText += part?.text || "";
             }
 
-            const [titleLine, ...descriptionLines] = fullText.trim().split("\n");
-
-            setSeoData({
-                title: titleLine || "",
-                description: descriptionLines.join(" ").trim() || "",
-            });
+            setSeoData({ html: fullText.trim() });
 
         } catch (error) {
             toast.error("Failed to generate SEO content.");
@@ -151,6 +142,7 @@ Description: ${productData.description}
             setLoadingSEO(false);
         }
     };
+
 
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text);
@@ -177,7 +169,9 @@ Description: ${productData.description}
                 src="https://js.puter.com/v2/"
                 strategy="afterInteractive"
                 onLoad={() => setPuterReady(true)}
+
             />
+
 
             <div className="bg-gray-900 p-8 rounded-2xl shadow-2xl space-y-8">
                 <h2 className="text-3xl font-extrabold text-white mb-6">🧠 AI Assistant</h2>
@@ -234,7 +228,6 @@ Description: ${productData.description}
                             </div>
                         )}
 
-                        {/* SEO Tab */}
                         {activeTab === "seo" && (
                             <div className="space-y-6">
                                 <button
@@ -245,32 +238,29 @@ Description: ${productData.description}
                                     {loadingSEO ? "Generating..." : "Generate SEO Content"}
                                 </button>
 
-                                {(seoData.title || seoData.description) && (
+                                {seoData.html && (
                                     <div className="bg-gray-800 p-6 rounded-xl space-y-6 relative">
-                                        <div>
-                                            <h3 className="text-xl font-bold text-white mb-2">Title:</h3>
-                                            <p className="text-gray-300 whitespace-pre-line">{seoData.title}</p>
+                                        <div className="prose prose-invert max-w-none text-white">
+                                            <div dangerouslySetInnerHTML={{ __html: seoData.html }} />
                                         </div>
-
-                                        <div>
-                                            <h3 className="text-xl font-bold text-white mb-2">Description:</h3>
-                                            <p className="text-gray-300 whitespace-pre-line">{seoData.description}</p>
-                                        </div>
-                                        
 
                                         <button
-                                            onClick={() => handleCopy(`${seoData.title}\n\n${seoData.description}`)}
+                                            onClick={() => handleCopy(seoData.html)}
                                             className="absolute top-4 right-4 bg-gray-700 hover:bg-gray-600 text-white text-sm px-4 py-2 rounded-lg transition"
                                         >
                                             Copy
                                         </button>
                                     </div>
                                 )}
+
+
                             </div>
                         )}
+
                     </>
                 )}
             </div>
         </div>
     );
 }
+

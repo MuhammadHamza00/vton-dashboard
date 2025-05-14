@@ -5,7 +5,11 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import EditProductForm from "@/components/EditProductForm";
 import ProductReviews from "@/components/ProductReviews";
-import AIProductsEnhancer from "@/components/AIProductsEnhancer";
+import dynamic from "next/dynamic";
+
+const AIProductsEnhancer = dynamic(() => import("@/components/AIProductsEnhancer"), {
+  ssr: false,
+});
 
 
 export default function ProductPage() {
