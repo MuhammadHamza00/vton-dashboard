@@ -173,13 +173,13 @@ export default function AIProductsEnhancer({ productId }: { productId: string })
             />
 
 
-            <div className="bg-gray-900 p-8 rounded-2xl shadow-2xl space-y-8">
-                <h2 className="text-3xl font-extrabold text-white mb-6">🧠 AI Assistant</h2>
+            <div className="border-1 border-gray-800 p-8 rounded-md shadow-2xl space-y-8">
+                <h2 className="text-3xl font-bold text-white mb-6">🧠 AI Assistant</h2>
 
                 {/* Tabs */}
                 <div className="flex space-x-4 mb-6">
                     <button
-                        className={`py-2 px-6 rounded-full font-semibold transition ${activeTab === "summary" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"
+                        className={`py-2 px-6 rounded-md  transition ${activeTab === "summary" ? "bg-gray-800  text-white " : "border-1 border-gray-800 text-gray-300"
                             }`}
                         onClick={() => setActiveTab("summary")}
                     >
@@ -187,7 +187,7 @@ export default function AIProductsEnhancer({ productId }: { productId: string })
                     </button>
 
                     <button
-                        className={`py-2 px-6 rounded-full font-semibold transition ${activeTab === "seo" ? "bg-green-600 text-white" : "bg-gray-700 text-gray-300"
+                        className={`py-2 px-6 rounded-md  transition ${activeTab === "seo" ? "bg-gray-800  text-white" : "border-1 border-gray-800 text-gray-300"
                             }`}
                         onClick={() => setActiveTab("seo")}
                     >
@@ -207,19 +207,19 @@ export default function AIProductsEnhancer({ productId }: { productId: string })
                                 <button
                                     onClick={handleSummarizeReviews}
                                     disabled={loadingReview}
-                                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-xl transition"
+                                    className="bg-blue-500 hover:bg-blue-600 text-white  py-3 px-8 rounded-md transition"
                                 >
                                     {loadingReview ? "Summarizing..." : "Summarize Reviews"}
                                 </button>
 
                                 {reviewSummary && (
-                                    <div className="bg-gray-800 p-6 rounded-xl relative">
-                                        <h3 className="text-xl font-bold text-white mb-4">Summary:</h3>
+                                    <div className="border-1 border-gray-800 p-6 rounded-xl relative">
+                                        <h3 className="text-xl text-white mb-4">Summary:</h3>
                                         <p className="text-gray-300 whitespace-pre-line">{reviewSummary}</p>
 
                                         <button
                                             onClick={() => handleCopy(reviewSummary)}
-                                            className="absolute top-4 right-4 bg-gray-700 hover:bg-gray-600 text-white text-sm px-4 py-2 rounded-lg transition"
+                                            className="absolute top-4 right-4 bg-gray-700 hover:bg-gray-600 text-white text-sm px-4 py-2 rounded-lg transition cursor-pointer"
                                         >
                                             Copy
                                         </button>
@@ -233,14 +233,14 @@ export default function AIProductsEnhancer({ productId }: { productId: string })
                                 <button
                                     onClick={handleGenerateSEO}
                                     disabled={loadingSEO}
-                                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-xl transition"
+                                    className="bg-blue-500 hover:bg-blue-600 text-white  py-3 px-8 rounded-md transition"
                                 >
                                     {loadingSEO ? "Generating..." : "Generate SEO Content"}
                                 </button>
 
                                 {seoData.html && (
-                                    <div className="bg-gray-800 p-6 rounded-xl space-y-6 relative">
-                                        <div className="prose prose-invert max-w-none text-white">
+                                    <div className="border-1 border-gray-800 p-6 rounded-xl space-y-6 relative">
+                                        <div className="prose prose-invert max-w-none text-gray-300">
                                             <div dangerouslySetInnerHTML={{ __html: seoData.html }} />
                                         </div>
 

@@ -13,7 +13,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: { isOpen: boolean, to
     { name: 'Products', icon: <FaBox />, href: '/dashboard/products' },
     { name: 'Orders', icon: <FaShoppingCart />, href: '/dashboard/orders' },
     { name: 'Customers', icon: <FaUsers />, href: '/dashboard/customers' },
-    { name: 'AI Assistant', icon: <FaRobot />, href: '/dashboard/ai' },
+    { name: 'AI Assistant', icon: <FaRobot />, href: '/dashboard/chatbot' },
     { name: 'Settings', icon: <FaCog />, href: '/dashboard/settings' },
   ];
 
@@ -37,7 +37,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: { isOpen: boolean, to
         <nav className="flex flex-col mt-5 space-y-2">
           {menuItems.map((item) => (
             <Link key={item.name} href={item.href} className="group">
-              <div className={`flex items-center gap-4 px-6 py-3 rounded-lg cursor-pointer transition-all
+              <div className={`flex items-center gap-4 px-6 py-3 rounded-md cursor-pointer transition-all
                 ${pathname === item.href ? 'bg-[#111827] border-1 border-[#334155]  text-white' : 'hover:bg-[#111827]  hover:border-1 border-[#334155]'}`}>
                 <div className="text-lg">{item.icon}</div>
                 <div className="text-md">{item.name}</div>

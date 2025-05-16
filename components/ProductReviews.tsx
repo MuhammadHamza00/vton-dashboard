@@ -132,7 +132,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
       {currentReviews.map((review) => (
         <div
           key={review.id}
-          className="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-xl transition-shadow space-y-3"
+          className="border-1 border-gray-800 rounded-lg p-4 shadow-lg hover:shadow-xl transition-shadow space-y-3"
         >
           <div className="flex items-center justify-between">
             <div className="text-yellow-400 font-semibold text-lg">
@@ -140,20 +140,20 @@ export default function ProductReviews({ productId }: { productId: string }) {
                 <span key={i}>⭐</span>
               ))}
             </div>
-            <div className="text-xs text-gray-400">
+            <div className="text-xs text-gray-300">
               {new Date(review.created_at).toLocaleDateString()}
             </div>
           </div>
 
           <div className="text-white">{review.content}</div>
 
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-gray-300">
             {getUserInfo(review.user_id)}
           </div>
 
           {/* Show Admin Reply if available */}
           {review.reply_content && (
-            <div className="bg-blue-900 text-blue-200 p-3 rounded-lg mt-3 text-sm">
+            <div className="bg-gray-900 text-white p-3 rounded-lg mt-3 text-sm">
               <strong>Admin Reply:</strong> {review.reply_content}
             </div>
           )}

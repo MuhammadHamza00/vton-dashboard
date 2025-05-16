@@ -165,7 +165,7 @@ export default function EditProductPage() {
     }
 
     return (
-        <div className="bg-[#111827] p-5 rounded-2xl shadow hover:shadow-lg transition-all max-w-5xl mx-auto mt-5">
+        <div className="border-1 border-gray-800 p-5 rounded-2xl shadow hover:shadow-lg transition-all max-w-5xl mx-auto mt-5">
             <h3 className="text-white text-xl mb-6">Edit Product</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -295,7 +295,7 @@ export default function EditProductPage() {
             <button
                 onClick={handleUpdateProduct}
                 disabled={isUpdating}
-                className="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg w-full flex items-center justify-center"
+                className="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-md w-full flex items-center justify-center"
             >
                 {isUpdating ? (
                     <div className="flex items-center space-x-2">
