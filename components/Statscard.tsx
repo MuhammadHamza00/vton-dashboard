@@ -94,7 +94,7 @@ export default function StatsCards() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-4">
       <AnimatePresence>
         {loading ? (
           Array(4).fill(0).map((_, index) => (
