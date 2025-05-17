@@ -4,17 +4,26 @@ import { useEffect, useState } from 'react';
 import { supabase } from "@/lib/supabaseClient";
 import Script from 'next/script';
 
-declare global {
-  interface Window {
-    puter: any;
-  }
-}
 
 export default function AdminAIPage() {
   const [puterReady, setPuterReady] = useState(false);
   const [query, setQuery] = useState('');
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const checkPuterReady = () => {
+      if (typeof window !== 'undefined' && window.puter?.ai?.chat) {
+        setPuterReady(true);
+        console.log("✅ Puter ready in this component!");
+      } else {
+        setTimeout(checkPuterReady, 300);
+      }
+    };
+
+    checkPuterReady();
+  }, []);
+
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -82,22 +91,7 @@ Please respond based on this data in best Format for Users.`,
 
   return (
     <div className="relative">
-      <Script
-        src="https://js.puter.com/v2/"
-        strategy="afterInteractive"
-        onLoad={() => {
-          const checkPuterReady = () => {
-            if (typeof window !== 'undefined' && window.puter?.ai?.chat) {
-              setPuterReady(true);
-              console.log("✅ Puter is ready!");
-            } else {
-              setTimeout(checkPuterReady, 300);
-            }
-          };
-
-          checkPuterReady();
-        }}
-      />
+    
 
 
       <div className="max-w-full mx-auto p-4 h-screen flex flex-col scrollbar-track-black bg-[#111827] border-1 border-[#334155] rounded-2xl">

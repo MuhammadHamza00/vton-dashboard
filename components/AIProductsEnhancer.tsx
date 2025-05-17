@@ -5,11 +5,6 @@ import { toast } from "react-hot-toast";
 import { supabase } from "@/lib/supabaseClient";
 import Script from "next/script";
 
-declare global {
-    interface Window {
-        puter: any;
-    }
-}
 
 export default function AIProductsEnhancer({ productId }: { productId: string }) {
     const [productData, setProductData] = useState<null | {
@@ -28,6 +23,19 @@ export default function AIProductsEnhancer({ productId }: { productId: string })
     const [loadingSEO, setLoadingSEO] = useState(false);
     const [loadingProduct, setLoadingProduct] = useState(true);
     const [puterReady, setPuterReady] = useState(false);
+
+    useEffect(() => {
+        const checkPuterReady = () => {
+            if (typeof window !== 'undefined' && window.puter?.ai?.chat) {
+                setPuterReady(true);
+                console.log("✅ Puter ready in this component!");
+            } else {
+                setTimeout(checkPuterReady, 300);
+            }
+        };
+
+        checkPuterReady();
+    }, []);
 
     useEffect(() => {
         async function fetchProduct() {
@@ -164,14 +172,6 @@ export default function AIProductsEnhancer({ productId }: { productId: string })
 
     return (
         <div className="relative">
-            {/* Load Puter Script */}
-            <Script
-                src="https://js.puter.com/v2/"
-                strategy="afterInteractive"
-                onLoad={() => setPuterReady(true)}
-
-            />
-
 
             <div className="border-1 border-gray-800 p-8 rounded-md shadow-2xl space-y-8">
                 <h2 className="text-3xl font-bold text-white mb-6">🧠 AI Assistant</h2>
