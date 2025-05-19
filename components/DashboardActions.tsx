@@ -83,27 +83,33 @@ export default function ExportSection() {
   const shouldShowStatus = exportType === 'Orders';
 
   return (
-    <div className="w-full bg-[#111827] p-4 border border-[#334155] rounded-xl mb-3">
+    <div className="w-full bg-[#111827] p-4 border border-[#334155] rounded-xl mb-3s">
       <Toaster position="top-center" />
 
-      <div className="flex items-center ">
+      <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-1">
         <AddProductButton onClick={() => router.push("/dashboard/products/addproduct")} />
 
         <button
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow ml-4"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2  sm:text-base rounded shadow transition-all"
           onClick={() => setModalOpen(true)}
         >
           📦 Export Data
         </button>
+
         <button
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow ml-4 mr-4"
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 sm:text-base rounded shadow transition-all"
           onClick={() => setShowBulkUpload((prev) => !prev)}
         >
           📤 {showBulkUpload ? "Hide" : "Bulk Upload CSV"}
         </button>
-        {/* Show BulkUploadCSV component conditionally */}
-        {showBulkUpload && <BulkProductUpload />}
+
+        {showBulkUpload && (
+          <div className="w-full mt-4">
+            <BulkProductUpload />
+          </div>
+        )}
       </div>
+
 
       {/* Modal */}
       {modalOpen && (
