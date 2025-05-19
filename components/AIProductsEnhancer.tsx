@@ -5,7 +5,6 @@ import { toast } from "react-hot-toast";
 import { supabase } from "@/lib/supabaseClient";
 import Script from "next/script";
 
-
 export default function AIProductsEnhancer({ productId }: { productId: string }) {
     const [productData, setProductData] = useState<null | {
         name: string;
